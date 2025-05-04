@@ -1,7 +1,7 @@
 {
-  "name": "Juz Amma Quiz",
-  "short_name": "JuzAmma",
-  "start_url": ".",
+  "name": "مسابقة جزء عمّ",
+  "short_name": "جزء عمّ",
+  "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#fff5e6",
   "theme_color": "#ffe6e6",
