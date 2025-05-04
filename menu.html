@@ -3,98 +3,46 @@
 <html lang="ar">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>الصفحة الرئيسية - مسابقة جزء عمّ</title>
+  <title>القائمة الرئيسية - مسابقة جزء عمّ</title>
   <style>
     body {
       font-family: 'Cairo', sans-serif;
-      background: linear-gradient(to bottom right, #fdf6ec, #ffe6e6);
+      background: linear-gradient(to bottom right, #fff5e6, #ffe6e6);
       display: flex;
       flex-direction: column;
-      align-items: center;
       justify-content: center;
+      align-items: center;
       min-height: 100vh;
       direction: rtl;
-      padding: 20px;
-    }
-    .container {
-      background: white;
-      border-radius: 20px;
-      padding: 30px;
-      max-width: 500px;
-      width: 100%;
-      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-      text-align: center;
-    }
-    input, button {
-      padding: 10px 20px;
-      margin: 10px;
-      border-radius: 10px;
-      border: none;
-      font-size: 1.1em;
-    }
-    button {
-      background-color: #f9d29d;
-      cursor: pointer;
-    }
-    button:disabled {
-      background-color: #eee;
-      cursor: not-allowed;
     }
     h1 {
       color: #e67e22;
+      margin-bottom: 20px;
     }
-    .section-buttons button {
-      display: block;
-      width: 100%;
-      margin-bottom: 10px;
+    button {
+      font-size: 1.2em;
+      margin: 10px;
+      padding: 10px 25px;
+      border: none;
+      border-radius: 10px;
+      background-color: #fceabb;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    button:hover {
+      background-color: #f9d29d;
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1>مرحبًا بك في مسابقة جزء عمّ!</h1>
-    <input type="text" id="playerName" placeholder="أدخل اسمك">
-    <button onclick="saveName()">ابدأ اللعب</button>
-    <div id="progress" style="margin:10px 0;"></div>
-    <div class="section-buttons" style="display:none;" id="sections">
-      <button onclick="startSection(1)">القسم 1: اختر السورة</button>
-      <button id="sec2" onclick="startSection(2)" disabled>القسم 2: اختر رقم الآية</button>
-      <button id="sec3" onclick="startSection(3)" disabled>القسم 3: اختر نص الآية</button>
-      <button id="sec4" onclick="startSection(4)" disabled>القسم 4: استمع واختر السورة</button>
-    </div>
-  </div>
+  <h1>🌟 مسابقة جزء عمّ للأطفال 🌟</h1>
+  <button onclick="location.href='index.html'">ابدأ المسابقة</button>
+  <button onclick="alert('هذا التطبيق يساعد الأطفال على مراجعة جزء عمّ بطريقة ممتعة وتفاعلية.')">عن التطبيق</button>
+  <button onclick="exitApp()">❌ خروج</button>
 
   <script>
-    function saveName() {
-      const name = document.getElementById("playerName").value.trim();
-      if (!name) return alert("يرجى إدخال الاسم!");
-      localStorage.setItem("quizPlayer", name);
-      document.getElementById("progress").innerText = `مرحبًا ${name}!`;
-      showSections();
-    }
-
-    function showSections() {
-      document.getElementById("sections").style.display = "block";
-
-      // Fake progress logic (placeholder, replace with real tracking later)
-      const unlocked = parseInt(localStorage.getItem("unlocked") || "1");
-      for (let i = 2; i <= 4; i++) {
-        document.getElementById("sec" + i).disabled = i > unlocked;
-      }
-    }
-
-    function startSection(num) {
-      localStorage.setItem("selectedSection", num);
-      window.location.href = "index.html";
-    }
-
-    // Load if name exists
-    const existingName = localStorage.getItem("quizPlayer");
-    if (existingName) {
-      document.getElementById("playerName").value = existingName;
-      document.getElementById("progress").innerText = `مرحبًا ${existingName}!`;
-      showSections();
+    function exitApp() {
+      document.body.innerHTML = '<h2>شكرًا لاستخدامك التطبيق 🌟</h2>';
     }
   </script>
 </body>

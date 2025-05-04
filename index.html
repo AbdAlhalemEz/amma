@@ -69,6 +69,11 @@
     <div class="question" id="question"></div>
     <div class="options" id="options"></div>
     <div class="celebration" id="celebration"></div>
+  <div id="nav-buttons" style="margin-top: 20px; text-align: center;">
+    <button onclick="prevQuestion()">⏮️ السابق</button>
+    <button onclick="nextQuestion()">⏭️ التالي</button>
+  </div>
+
   </div>
 
 <audio id="clap">
@@ -96,14 +101,39 @@ function startSection(section) {
   currentIndex = 0;
   score = 0;
   document.getElementById("celebration").innerHTML = "";
-  loadQuestion();
+  
+function nextQuestion() {
+  currentIndex++;
+  if (currentIndex < quizData[currentSection].length) {
+    loadQuestion();
+  } else {
+    document.getElementById("question").innerHTML = `🏁 انتهت المسابقة!<br> نتيجتك: ${score} من ${quizData[currentSection].length}`;
+    document.getElementById("options").innerHTML = `
+      <button onclick="startSection('${currentSection}')">🔁 إعادة القسم</button>
+      <button onclick="document.location.reload()">🏠 العودة للقائمة الرئيسية</button>
+    `;
+    document.getElementById("nav-buttons").style.display = 'none';
+  }
+}
+
+function prevQuestion() {
+  if (currentIndex > 0) {
+    currentIndex--;
+    loadQuestion();
+  }
+}
+
+loadQuestion();
 }
 
 function loadQuestion() {
   const qset = quizData[currentSection];
   if (!qset || currentIndex >= qset.length) {
     document.getElementById("question").innerHTML = "انتهت المسابقة!";
-    document.getElementById("options").innerHTML = "";
+    document.getElementById("options").innerHTML = `
+      <button onclick="startSection('${currentSection}')">🔁 إعادة القسم</button>
+      <button onclick="document.location.reload()">🏠 العودة للقائمة الرئيسية</button>
+    `;
     document.getElementById("score").innerText = `النتيجة: ${score} / ${qset.length}`;
 document.getElementById("options").innerHTML = `
   <button onclick="startSection('${currentSection}')">🔁 إعادة القسم</button>
@@ -142,6 +172,7 @@ document.getElementById("options").innerHTML = `
 }
 
 function checkAnswer(selected, btn) {
+  document.getElementById("nav-buttons").style.display = 'block';
   const qset = quizData[currentSection];
   const qobj = qset[currentIndex];
   const options = document.querySelectorAll(".option");
@@ -166,7 +197,29 @@ function checkAnswer(selected, btn) {
 
   setTimeout(() => {
     currentIndex++;
+    
+function nextQuestion() {
+  currentIndex++;
+  if (currentIndex < quizData[currentSection].length) {
     loadQuestion();
+  } else {
+    document.getElementById("question").innerHTML = `🏁 انتهت المسابقة!<br> نتيجتك: ${score} من ${quizData[currentSection].length}`;
+    document.getElementById("options").innerHTML = `
+      <button onclick="startSection('${currentSection}')">🔁 إعادة القسم</button>
+      <button onclick="document.location.reload()">🏠 العودة للقائمة الرئيسية</button>
+    `;
+    document.getElementById("nav-buttons").style.display = 'none';
+  }
+}
+
+function prevQuestion() {
+  if (currentIndex > 0) {
+    currentIndex--;
+    loadQuestion();
+  }
+}
+
+loadQuestion();
   }, 1500);
 }
 </script>
