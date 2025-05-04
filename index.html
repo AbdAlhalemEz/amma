@@ -1,1 +1,174 @@
-<h1>Multi-section Quran Quiz</h1><p>Data in quiz_data.json</p>
+
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>مسابقة جزء عم - متعددة الأقسام</title>
+  <style>
+    body {
+      font-family: 'Cairo', sans-serif;
+      background: linear-gradient(to bottom right, #fff5e6, #ffe6e6);
+      padding: 20px;
+      direction: rtl;
+    }
+    .container {
+      max-width: 800px;
+      margin: auto;
+      background: white;
+      border-radius: 20px;
+      padding: 30px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    h1 {
+      text-align: center;
+      color: #e67e22;
+    }
+    .question {
+      font-size: 1.5em;
+      margin-bottom: 20px;
+    }
+    .options {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 15px;
+    }
+    .option {
+      background-color: #fceabb;
+      padding: 15px;
+      border-radius: 10px;
+      cursor: pointer;
+      text-align: center;
+    }
+    .correct {
+      background-color: #c8f7c5 !important;
+    }
+    .incorrect {
+      background-color: #f7c5c5 !important;
+    }
+    .score, .section-selector {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .celebration {
+      margin-top: 20px;
+      font-size: 1.2em;
+      color: green;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>مسابقة جزء عمّ</h1>
+    <div class="section-selector">
+      <button onclick="startSection('section1')">القسم 1: اختر السورة</button>
+      <button onclick="startSection('section2')">القسم 2: اختر رقم الآية</button>
+      <button onclick="startSection('section3')">القسم 3: اختر نص الآية</button>
+    </div>
+    <div class="score" id="score"></div>
+    <div class="question" id="question"></div>
+    <div class="options" id="options"></div>
+    <div class="celebration" id="celebration"></div>
+  </div>
+
+<audio id="clap">
+  <source src="https://www.soundjay.com/human/applause-01.mp3" type="audio/mpeg">
+</audio>
+<audio id="buzzer">
+  <source src="https://www.soundjay.com/button/beep-07.wav" type="audio/wav">
+</audio>
+  <source src="https://www.soundjay.com/human/applause-01.mp3" type="audio/mpeg">
+</audio>
+<div id="confetti" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:url('https://cdn.pixabay.com/animation/2022/10/26/15/36/15-36-28-660_512.gif') center/cover no-repeat;pointer-events:none;z-index:999;"></div>
+
+<script>
+let quizData = {};
+let currentSection = "";
+let currentIndex = 0;
+let score = 0;
+
+fetch("quiz_data.json")
+  .then(res => res.json())
+  .then(data => { quizData = data; });
+
+function startSection(section) {
+  currentSection = section;
+  currentIndex = 0;
+  score = 0;
+  document.getElementById("celebration").innerHTML = "";
+  loadQuestion();
+}
+
+function loadQuestion() {
+  const qset = quizData[currentSection];
+  if (!qset || currentIndex >= qset.length) {
+    document.getElementById("question").innerHTML = "انتهت المسابقة!";
+    document.getElementById("options").innerHTML = "";
+    document.getElementById("score").innerText = `النتيجة: ${score} / ${qset.length}`;
+document.getElementById("options").innerHTML = `
+  <button onclick="startSection('${currentSection}')">🔁 إعادة القسم</button>
+  <button onclick="document.location.reload()">🏠 العودة للقائمة</button>
+`;
+    return;
+  }
+
+  const qobj = qset[currentIndex];
+  const qDiv = document.getElementById("question");
+  const optDiv = document.getElementById("options");
+  const scoreDiv = document.getElementById("score");
+
+  scoreDiv.innerText = `السؤال ${currentIndex + 1} / ${qset.length}`;
+  optDiv.innerHTML = "";
+  document.getElementById("celebration").innerHTML = "";
+
+  // Format question
+  if (qobj.type === 1) {
+    qDiv.innerText = `ما السورة التي تحتوي على الآية التالية؟
+"${qobj.q}"`;
+  } else if (qobj.type === 2) {
+    qDiv.innerText = `ما رقم هذه الآية من سورة "${qobj.q.surah}"؟
+"${qobj.q.verse}"`;
+  } else if (qobj.type === 3) {
+    qDiv.innerText = `ما الآية رقم ${qobj.q.verse_num} من سورة "${qobj.q.surah}"؟`;
+  }
+
+  qobj.options.forEach((opt, i) => {
+    const btn = document.createElement("div");
+    btn.className = "option";
+    btn.innerText = opt;
+    btn.onclick = () => checkAnswer(i, btn);
+    optDiv.appendChild(btn);
+  });
+}
+
+function checkAnswer(selected, btn) {
+  const qset = quizData[currentSection];
+  const qobj = qset[currentIndex];
+  const options = document.querySelectorAll(".option");
+
+  options.forEach((opt, i) => {
+    if (i === qobj.correct) opt.classList.add("correct");
+    else if (i === selected) opt.classList.add("incorrect");
+    opt.onclick = null;
+  });
+
+  if (selected === qobj.correct) {
+    document.getElementById("clap").play().catch(()=>{});
+    const confetti = document.getElementById("confetti");
+    confetti.style.display = 'block';
+    setTimeout(() => { confetti.style.display = 'none'; }, 2000);
+    score++;
+    document.getElementById("celebration").innerText = "✔️ إجابة صحيحة!";
+  } else {
+    document.getElementById("buzzer").play().catch(()=>{});
+    document.getElementById("celebration").innerText = "❌ إجابة خاطئة.";
+  }
+
+  setTimeout(() => {
+    currentIndex++;
+    loadQuestion();
+  }, 1500);
+}
+</script>
+</body>
+</html>
