@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="manifest" href="manifest.json" />
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('service-worker.js');
+    }
+  </script>
+  <title>Juz Amma Quiz</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Cairo', sans-serif;
+      background: linear-gradient(to bottom right, #fff5e6, #ffe6e6);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      direction: rtl;
+    }
+    .quiz-container {
+      background: #fff;
+      border-radius: 20px;
+      padding: 30px;
+      max-width: 800px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+    .question {
+      font-size: 1.8em;
+      margin-bottom: 20px;
+      color: #e67e22;
+    }
+    .score {
+      font-size: 1.2em;
+      color: #555;
+    }
+    .options {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 15px;
+      margin-top: 20px;
+    }
+    .option {
+      background-color: #fceabb;
+      padding: 15px;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: 0.3s;
+      font-size: 1.1em;
+    }
+    .option:hover {
+      background-color: #f9d29d;
+    }
+    .correct {
+      background-color: #c8f7c5 !important;
+    }
+    .incorrect {
+      background-color: #f7c5c5 !important;
+    }
+    .celebration {
+      font-size: 2em;
+      margin-top: 20px;
+      color: #f39c12;
+    }
+    .confetti {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      background-image: url('https://media.giphy.com/media/3o6Zt481isNVuQI1l6/giphy.gif');
+      background-size: cover;
+      background-repeat: no-repeat;
+      z-index: 9999;
+    }
+  </style>
+</head>
+<body>
+  <div class="quiz-container">
+    <div class="score" id="score"></div>
+    <div class="question" id="question"></div>
+    <div class="options" id="options"></div>
+    <div class="celebration" id="celebration"></div>
+  </div>
+
+  <audio id="clap">
+    <source src="https://www.soundjay.com/human/applause-01.mp3" type="audio/mpeg" />
+  </audio>
+
+  <script>
+    const quizData = [
+      { q: "عَمَّ يَتَسَاءَلُونَ؟", options: ["النبأ", "التكوير", "الكوثر", "الطارق"], correct: 0 },
+      { q: "إِنَّ أَعْطَيْنَاكَ الْكَوْثَرَ", options: ["الكوثر", "الفجر", "التين", "العاديات"], correct: 0 },
+      { q: "وَالضُّحَى وَاللَّيْلِ إِذَا سَجَى", options: ["الضحى", "الليل", "الشمس", "الناس"], correct: 0 },
+      { q: "قُلْ أَعُوذُ بِرَبِّ الْفَلَقِ", options: ["الفلق", "الناس", "الإخلاص", "العصر"], correct: 0 }
+    ];
+    let currentIndex = 0;
+    let score = 0;
+    const questionEl = document.getElementById("question");
+    const optionsEl = document.getElementById("options");
+    const scoreEl = document.getElementById("score");
+    const celebrationEl = document.getElementById("celebration");
+    const clap = document.getElementById("clap");
+
+    function loadQuestion() {
+      scoreEl.textContent = `النقاط: ${score} / ${quizData.length}`;
+      const q = quizData[currentIndex];
+      questionEl.textContent = `السؤال ${currentIndex + 1}: ${q.q}`;
+      optionsEl.innerHTML = "";
+      q.options.forEach((opt, i) => {
+        const btn = document.createElement("div");
+        btn.textContent = opt;
+        btn.className = "option";
+        btn.onclick = () => checkAnswer(i, btn);
+        optionsEl.appendChild(btn);
+      });
+    }
+
+    function checkAnswer(i, btn) {
+      const correct = quizData[currentIndex].correct;
+      const buttons = document.querySelectorAll(".option");
+      buttons.forEach((b, index) => {
+        b.classList.remove("correct", "incorrect");
+        if (index === correct) b.classList.add("correct");
+        else if (index === i) b.classList.add("incorrect");
+        b.onclick = null;
+      });
+      if (i === correct) {
+        score++;
+        if (clap && clap.play) clap.play().catch(() => {});
+        celebrationEl.innerHTML = '<div class="confetti"></div>';
+        triggerConfetti();
+      } else {
+        celebrationEl.textContent = "❌ إجابة خاطئة";
+      }
+      setTimeout(() => {
+        celebrationEl.innerHTML = "";
+        currentIndex++;
+        if (currentIndex < quizData.length) loadQuestion();
+        else {
+          questionEl.innerHTML = `🏁 انتهت المسابقة!<br> نتيجتك: ${score} من ${quizData.length}`;
+          optionsEl.innerHTML = "";
+        }
+      }, 2000);
+    }
+
+    function triggerConfetti() {
+      const el = document.querySelector('.confetti');
+      if (el) setTimeout(() => el.remove(), 2000);
+    }
+
+    loadQuestion();
+  </script>
+</body>
+</html>
